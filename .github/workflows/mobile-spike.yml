@@ -32,10 +32,14 @@ jobs:
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           echo "udid=$UDID" >> "$GITHUB_OUTPUT"
-      - name: Doctor
-        run: npx mobilewright doctor --category ios || true
       - name: Install the on-device agent
-        run: npx mobilewright install -d "${{ steps.sim.outputs.udid }}"
+        run: |
+          for attempt in 1 2 3; do
+            npx mobilewright install -d "${{ steps.sim.outputs.udid }}" && exit 0
+            echo "agent install attempt $attempt failed, retrying"
+            sleep 10
+          done
+          exit 1
       - name: Run tests
         env:
           MW_PLATFORM: ios
@@ -69,7 +73,6 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           MW_PLATFORM: android
-          MW_DEVICE_ID: emulator-5554
         with:
           api-level: 34
           arch: x86_64
