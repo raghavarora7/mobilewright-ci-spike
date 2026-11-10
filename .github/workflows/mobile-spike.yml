@@ -40,10 +40,20 @@ jobs:
             sleep 10
           done
           exit 1
+      - name: Warm up the agent
+        run: |
+          mkdir -p results
+          for attempt in 1 2 3 4 5; do
+            npx mobilewright screenshot -d "${{ steps.sim.outputs.udid }}" -o results/warmup.png && exit 0
+            echo "warm-up attempt $attempt failed, retrying"
+            sleep 15
+          done
+          exit 1
       - name: Run tests
         env:
           MW_PLATFORM: ios
           MW_DEVICE_ID: ${{ steps.sim.outputs.udid }}
+          DEBUG: mw:driver-mobilecli
         run: npx mobilewright test
       - uses: actions/upload-artifact@v4
         if: always()
