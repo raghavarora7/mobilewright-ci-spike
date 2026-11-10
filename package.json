@@ -1,0 +1,9 @@
+{
+  "name": "mobilewright-ci-spike",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@mobilewright/test": "0.0.68",
+    "mobilewright": "0.0.68"
+  }
+}
